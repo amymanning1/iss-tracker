@@ -25,7 +25,7 @@ def get_epochs() -> list:
         return []
         exit()
     offset = request.args.get('offset',0)
-    limit = request.args.get('limit',len(data_usable))
+    limit = request.args.get('limit',len(data))
     if offset:
         try: 
             offset = int(offset)
@@ -133,6 +133,70 @@ def replace_data() -> dict:
     response = requests.get(url)
     data = xmltodict.parse(response.text)
     return data
+
+@app.route('/comment', methods=['GET'])
+def get_comments() -> list:
+    """
+    This function returns the comments list object from the data set.
+    Args: none
+    Returns: comment_list (list): a list of all the comment objects in the data set.
+    """
+    
+    if data == None:
+        return []
+        exit()
+    comment_list = []
+    for m in data['ndm']['oem']['body']['segment']['data']['COMMENT']:
+        comment_list.append(m)
+    return comment_list
+
+@app.route('/header', methods=['GET'])
+def get_header() -> dict:
+    """
+    This function returns the header information from the data set.
+    Args: none
+    Returns: header (dict): a dictionary of all the header information.
+    """
+    header = data['ndm']['oem']['header']
+    return header
+
+@app.route('/metadata', methods=['GET'])
+def get_meta() -> dict:
+    """
+    This function returns the metadata dict object from the data set.
+    Args: none
+    Returns: meta (dict): dictionary object of metadata extracted from data set.
+    """
+    meta = data['ndm']['oem']['body']['segment']['metadata']
+    return meta
+
+@app.route('/epochs/<epoch>/location', methods=['GET'])
+def location(epoch) -> dict:
+    """
+    This function takes in a user-specified epoch and calculates the latitude, longitude, altitude, and geoposition.
+    Args: epoch (str): An epoch referenced by the user in the query line that is available in the data set.
+    Returns: loc_dict (dict): a dictionary with the keys latitude, longitude, altitude, and geoposition and their corresponding values.
+    """
+    MEAN_EARTH_RADIUS = 6371 # km
+    if data == None:
+        return []
+        exit()
+    for d in data['ndm']['oem']['body']['segment']['data']['stateVector']:
+        epoch_list.append(d['EPOCH'])
+    if epoch in epoch_list:
+        ind = epoch_list.index(epoch)
+        spec_state = data['ndm']['oem']['body']['segment']['data']['stateVector'][ind]
+        
+    else:
+        return 'Error, please enter a valid Epoch value'
+    x = float(spec_state['X']['#text'])
+    y = float(spec_state['Y']['#text'])
+    z = float(spec_state['Z']['#text'])
+    hrs = float(spec_state[])
+    lat = math.degrees(math.atan2(z, math.sqrt(x**2 + y**2)))
+    lon = math.degrees(math.atan2(y, x)) - ((hrs-12)+(mins/60))*(360/24) + 24
+    alt = math.sqrt(x**2 + y**2 + z**2) - MEAN_EARTH_RADIUS
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
