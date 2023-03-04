@@ -1,6 +1,11 @@
 from flask import Flask, request
-import xmltodict, requests, math
+import xmltodict, requests, math, time
 app = Flask(__name__)
+
+from geopy.geocoders import Nominatim
+geocoder = Nominatim(user_agent='iss_tracker')
+
+from time import mktime
 
 url='https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.xml'
 response = requests.get(url)
@@ -178,6 +183,7 @@ def location(epoch) -> dict:
     Returns: loc_dict (dict): a dictionary with the keys latitude, longitude, altitude, and geoposition and their corresponding values.
     """
     MEAN_EARTH_RADIUS = 6371 # km
+    epoch_list=[]
     if data == None:
         return []
         exit()
@@ -186,16 +192,76 @@ def location(epoch) -> dict:
     if epoch in epoch_list:
         ind = epoch_list.index(epoch)
         spec_state = data['ndm']['oem']['body']['segment']['data']['stateVector'][ind]
+        x = float(spec_state['X']['#text'])
+        y = float(spec_state['Y']['#text'])
+        z = float(spec_state['Z']['#text'])
         
+        epoch_splitter = epoch.split('T', 1) # series of splits to access hrs and minutes needed for lon calculations
+        time = epoch_splitter[1]
+        remove_z = time.split('.',1)
+        hrs_list = remove_z[0].split(':')
+        hrs = float(hrs_list[0])
+        mins = float(hrs_list[1])
+        
+        lat = math.degrees(math.atan2(z, math.sqrt(x**2 + y**2)))
+        lon = math.degrees(math.atan2(y, x)) - ((hrs-12)+(mins/60))*(360/24) + 24
+        alt = math.sqrt(x**2 + y**2 + z**2) - MEAN_EARTH_RADIUS
+        geoloc = geocoder.reverse((lat, lon), zoom=15, language='en')
+        loc_dict = {'latitude' : lat, 'longitude' : lon, 'altitude' : alt, 'geolocation' : geoloc.raw}
+        return loc_dict
+
+
     else:
         return 'Error, please enter a valid Epoch value'
+
+@app.route('/now', methods=['GET'])
+def now() -> dict:
+    """
+    This function notes the current time and returns a dictionary of latitude, longitude, altitude, and geoposition of the epoch nearest in time.
+    Args: none
+    Returns: now_dict (dict): A dictionary with key values: latitude, longitude, altitude, and geoposition of the most recent epoch.
+    {} (dict): an empty dict if the data has been deleted and not reposted.
+    """
+    if data == None:
+        return []
+        exit()
+    # get current time
+    # convert to seconds if it is not
+    # for loop to find closest epoch to it (might have to use slicing methodfrom location route)
+    # once smallest difference is found, return that epoch's information as well as the epoch itself as 'closest epoch' and the difference in seconds
+    closest_epoch = 0;
+    smallest_diff = 1e6;
+    time_now = time.time()
+    epoch_list=[]
+    for d in data['ndm']['oem']['body']['segment']['data']['stateVector']:
+        epoch_list.append(d['EPOCH'])
+        time_epoch = time.mktime(time.strptime(epoch[:-5], '%Y-%jT%H:%M:%S'))
+        difference = time_now - time_epoch
+        if difference < smallest_diff:
+            smallest_diff = difference
+            closest_epoch = epoch
+            ind = epoch_list.index()
+
+    spec_state = data['ndm']['oem']['body']['segment']['data']['stateVector'][ind]
     x = float(spec_state['X']['#text'])
     y = float(spec_state['Y']['#text'])
     z = float(spec_state['Z']['#text'])
-    hrs = float(spec_state[])
+
+    epoch_splitter = epoch.split('T', 1) # series of splits to access hrs and minutes needed for lon calculations
+    time = epoch_splitter[1]
+    remove_z = time.split('.',1)
+    hrs_list = remove_z[0].split(':')
+    hrs = float(hrs_list[0])
+    mins = float(hrs_list[1])
+
     lat = math.degrees(math.atan2(z, math.sqrt(x**2 + y**2)))
     lon = math.degrees(math.atan2(y, x)) - ((hrs-12)+(mins/60))*(360/24) + 24
     alt = math.sqrt(x**2 + y**2 + z**2) - MEAN_EARTH_RADIUS
+    geoloc = geocoder.reverse((lat, lon), zoom=15, language='en')
+    loc_dict = {'latitude' : lat, 'longitude' : lon, 'altitude' : alt, 'geolocation' : geoloc.raw}
+
+    now_dict = {'closest_epoch' : closest_epoch, 'seconds_from_now':difference, 'location':loc_dict}
+    return now_dict
 
 
 if __name__ == '__main__':
