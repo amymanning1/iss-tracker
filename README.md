@@ -101,7 +101,7 @@ Each time you change the `Dockerfile` or `iss_tracker.py`, you must rebuild the 
                 "X_DOT": {
                   "#text": "5.2410359153923798",
                   "@units": "km/s"
-                },
+                }`
 + `curl 127.0.0.1:5000/comment`
   - `[
   "Units are in kg and m^2",
@@ -136,12 +136,12 @@ Each time you change the `Dockerfile` or `iss_tracker.py`, you must rebuild the 
   "End sequence of events"
 ]`
 * `curl 127.0.0.1:5000/header`
-  - {
+  - `{
   "CREATION_DATE": "2023-063T04:34:04.606Z",
   "ORIGINATOR": "JSC"
-}
+}`
 + `curl 127.0.0.1:5000/metadata`
-  - {
+  - `{
   "CENTER_NAME": "EARTH",
   "OBJECT_ID": "1998-067-A",
   "OBJECT_NAME": "ISS",
@@ -149,8 +149,9 @@ Each time you change the `Dockerfile` or `iss_tracker.py`, you must rebuild the 
   "START_TIME": "2023-062T15:47:35.995Z",
   "STOP_TIME": "2023-077T15:47:35.995Z",
   "TIME_SYSTEM": "UTC"
-}
-* `{
+}`
+* `curl 127.0.0.1:5000/epochs/<epochname>/location`
+  - `{
   "altitude": 420.6341310992075,
   "geolocation": {
     "address": {
@@ -178,7 +179,7 @@ Each time you change the `Dockerfile` or `iss_tracker.py`, you must rebuild the 
   "longitude": -111.15947635149035
 }`
 * `curl 127.0.0.1:5000/now`
-  - {
+  - `{
   "closest_epoch": "2023-077T15:47:35.995Z",
   "location": {
     "altitude": 428.6137193341565,
@@ -207,6 +208,6 @@ Each time you change the `Dockerfile` or `iss_tracker.py`, you must rebuild the 
     "longitude": 13.126560404682472
   },
   "seconds_from_now": -1079988.4640915394
-} 
+} `
 ## About the Data
 This data is coordinates on the international space station's current location. After the headers, the state vectors are listed at four-minute intervals and updated three times a week. This data is collected to determine the trajectory of the ISS to prevent collisions or it going too far off course. Determining trajectory is also important to maintain communication with the ground. There is a unique epoch for every data point which acts as an id. The data inside the state vector is the epoch, X, Y, Z, X_DOT, Y_DOT, and Z_DOT coordinates. The raw coordinates are in kilometers and the _DOT coordinates and the time derivatives or velocities at each position in km/s.   
