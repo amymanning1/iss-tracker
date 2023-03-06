@@ -208,14 +208,7 @@ def location(epoch) -> dict:
         alt = math.sqrt(x**2 + y**2 + z**2) - MEAN_EARTH_RADIUS
         geoloc = geocoder.reverse((lat, lon), zoom=zoom_set, language='en')
         if geoloc == None:
-            while True:
-                zoom_set = zoom_set - 1
-                if zoom_set < 0 or zoom_set > 18:
-                    return 'Error, could not find geolocation. The ISS might be over a large area of ocean or the initial zoom_set is not between 0 and 18.'
-                geoloc = geocoder.reverse((lat, lon), zoom=zoom_set, language='en')
-                if geoloc != None:
-                    break
-        
+            return 'Error, the geolocation could not be calculated because the ISS is over the ocean.' 
         loc_dict = {'latitude' : lat, 'longitude' : lon, 'altitude' : alt, 'geolocation' : geoloc.raw}
         return loc_dict
 
@@ -270,13 +263,8 @@ def now() -> dict:
     alt = math.sqrt(x**2 + y**2 + z**2) - MEAN_EARTH_RADIUS
     geoloc = geocoder.reverse((lat, lon), zoom=15, language='en')
     if geoloc == None:
-            while True:
-                zoom_set = zoom_set - 1
-                if zoom_set < 0 or zoom_set > 18:
-                    return 'Error, could not find geolocation. The ISS might be over a large area of ocean or the initial zoom_set is not between 0 and 18.'
-                geoloc = geocoder.reverse((lat, lon), zoom=zoom_set, language='en')
-                if geoloc != None:
-                    break
+        return 'Error, the geolocation could not be calculated because the ISS is over the ocean.'
+                    
     loc_dict = {'latitude' : lat, 'longitude' : lon, 'altitude' : alt, 'geolocation' : geoloc.raw}
 
     now_dict = {'closest_epoch' : closest_epoch, 'seconds_from_now':difference, 'location':loc_dict}
