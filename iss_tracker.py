@@ -189,6 +189,7 @@ def location(epoch) -> dict:
     for d in data['ndm']['oem']['body']['segment']['data']['stateVector']:
         epoch_list.append(d['EPOCH'])
     if epoch in epoch_list:
+        zoom_set = 15
         ind = epoch_list.index(epoch)
         spec_state = data['ndm']['oem']['body']['segment']['data']['stateVector'][ind]
         x = float(spec_state['X']['#text'])
@@ -205,7 +206,16 @@ def location(epoch) -> dict:
         lat = math.degrees(math.atan2(z, math.sqrt(x**2 + y**2)))
         lon = math.degrees(math.atan2(y, x)) - ((hrs-12)+(mins/60))*(360/24) + 24
         alt = math.sqrt(x**2 + y**2 + z**2) - MEAN_EARTH_RADIUS
-        geoloc = geocoder.reverse((lat, lon), zoom=15, language='en')
+        geoloc = geocoder.reverse((lat, lon), zoom=zoom_set, language='en')
+        if geoloc == None:
+            while True:
+                zoom_set = zoom_set - 1
+                if zoom_set < 0 or zoom_set > 18:
+                    return 'Error, could not find geolocation. The ISS might be over a large area of ocean or the initial zoom_set is not between 0 and 18.'
+                geoloc = geocoder.reverse((lat, lon), zoom=zoom_set, language='en')
+                if geoloc != None:
+                    break
+        
         loc_dict = {'latitude' : lat, 'longitude' : lon, 'altitude' : alt, 'geolocation' : geoloc.raw}
         return loc_dict
 
@@ -259,6 +269,14 @@ def now() -> dict:
     lon = math.degrees(math.atan2(y, x)) - ((hrs-12)+(mins/60))*(360/24) + 24
     alt = math.sqrt(x**2 + y**2 + z**2) - MEAN_EARTH_RADIUS
     geoloc = geocoder.reverse((lat, lon), zoom=15, language='en')
+    if geoloc == None:
+            while True:
+                zoom_set = zoom_set - 1
+                if zoom_set < 0 or zoom_set > 18:
+                    return 'Error, could not find geolocation. The ISS might be over a large area of ocean or the initial zoom_set is not between 0 and 18.'
+                geoloc = geocoder.reverse((lat, lon), zoom=zoom_set, language='en')
+                if geoloc != None:
+                    break
     loc_dict = {'latitude' : lat, 'longitude' : lon, 'altitude' : alt, 'geolocation' : geoloc.raw}
 
     now_dict = {'closest_epoch' : closest_epoch, 'seconds_from_now':difference, 'location':loc_dict}
