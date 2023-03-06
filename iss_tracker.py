@@ -5,7 +5,6 @@ app = Flask(__name__)
 from geopy.geocoders import Nominatim
 geocoder = Nominatim(user_agent='iss_tracker')
 
-from time import mktime
 
 url='https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.xml'
 response = requests.get(url)
@@ -223,7 +222,7 @@ def now() -> dict:
     {} (dict): an empty dict if the data has been deleted and not reposted.
     """
     if data == None:
-        return []
+        return {}
         exit()
     # get current time
     # convert to seconds if it is not
@@ -231,16 +230,18 @@ def now() -> dict:
     # once smallest difference is found, return that epoch's information as well as the epoch itself as 'closest epoch' and the difference in seconds
     closest_epoch = 0;
     smallest_diff = 1e6;
-    time_now = time.time()
+    MEAN_EARTH_RADIUS = 6371 #km
+    time_current = time.time()
     epoch_list=[]
     for d in data['ndm']['oem']['body']['segment']['data']['stateVector']:
         epoch_list.append(d['EPOCH'])
+        epoch = d['EPOCH']
         time_epoch = time.mktime(time.strptime(epoch[:-5], '%Y-%jT%H:%M:%S'))
-        difference = time_now - time_epoch
+        difference = time_current - time_epoch
         if difference < smallest_diff:
             smallest_diff = difference
             closest_epoch = epoch
-            ind = epoch_list.index()
+            ind = epoch_list.index(epoch)
 
     spec_state = data['ndm']['oem']['body']['segment']['data']['stateVector'][ind]
     x = float(spec_state['X']['#text'])
@@ -248,8 +249,8 @@ def now() -> dict:
     z = float(spec_state['Z']['#text'])
 
     epoch_splitter = epoch.split('T', 1) # series of splits to access hrs and minutes needed for lon calculations
-    time = epoch_splitter[1]
-    remove_z = time.split('.',1)
+    time_notmod = epoch_splitter[1]
+    remove_z = time_notmod.split('.',1)
     hrs_list = remove_z[0].split(':')
     hrs = float(hrs_list[0])
     mins = float(hrs_list[1])
