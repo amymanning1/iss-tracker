@@ -204,7 +204,7 @@ def location(epoch) -> dict:
         mins = float(hrs_list[1])
         
         lat = math.degrees(math.atan2(z, math.sqrt(x**2 + y**2)))
-        lon = math.degrees(math.atan2(y, x)) - ((hrs-12)+(mins/60))*(360/24) + 24
+        lon = math.degrees(math.atan2(y, x)) - ((hrs-12)+(mins/60))*(360/24) + 32
         alt = math.sqrt(x**2 + y**2 + z**2) - MEAN_EARTH_RADIUS
         geoloc = geocoder.reverse((lat, lon), zoom=zoom_set, language='en')
         if geoloc == None:
@@ -259,7 +259,7 @@ def now() -> dict:
     mins = float(hrs_list[1])
 
     lat = math.degrees(math.atan2(z, math.sqrt(x**2 + y**2)))
-    lon = math.degrees(math.atan2(y, x)) - ((hrs-12)+(mins/60))*(360/24) + 24
+    lon = math.degrees(math.atan2(y, x)) - ((hrs-12)+(mins/60))*(360/24) + 32
     alt = math.sqrt(x**2 + y**2 + z**2) - MEAN_EARTH_RADIUS
     geoloc = geocoder.reverse((lat, lon), zoom=15, language='en')
     if geoloc == None:
