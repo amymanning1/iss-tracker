@@ -9,5 +9,3 @@ services:
         ports:
                 - 5000:5000 
         image: amymanning1/iss_tracker:midterm
-        #volumes:
-        #   - ./config.yaml:/config.yaml

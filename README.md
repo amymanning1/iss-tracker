@@ -1,7 +1,7 @@
 # Orbital Ephemeris Message (OEM) Data Query and Containerization 
 This folder, `iss_tracker` , contains a program called `iss_tracker.py`, `Dockerfile`, `docker-compose.yml` and this `README.md` file. The `Dockerfile` is a text files that contains all necessary instructions to build a docker image from the command line. `docker-compose.yml` is a YAML file that shortens the docker command line commands by interpreting docker rules as YAML. `iss_tracker.py` takes in xml data from [NASA](https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.xml) and converts the xml information to a dictionary. With this data type, the user can use flask to query for the program to return the options listed under Flask App. This is important because by sifting through this data, the user can harvest important information about the International Space Station's trajectory to predict clear paths and prevent collisions. 
 ## How to Access the Data
-The [data](https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.xml) is available through this hyperlink on ISS's trajectory website. This link is already in `iss_tracker.py` therefore downloading the raw XML data is only necessary if the user prefers to view the structure of the data. 
+The [data](https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.xml) is available through this hyperlink on ISS's trajectory website. This link is already in `iss_tracker.py` therefore downloading the raw XML data is only necessary if the user prefers to view the structure. 
 ## Flask App
 The flask app contains 12 routes: 
 1. `/` : returns the entire data set
@@ -53,11 +53,7 @@ Each time you change the `Dockerfile` or `iss_tracker.py`, you must rebuild the 
    - This is only a sample output, the actual output is much longer
 - `curl 127.0.0.1:5000/epochs`
   - `[
-  "2023-048T12:00:00.000Z",
-  "2023-048T12:04:00.000Z",
-  "2023-048T12:08:00.000Z",
-  "2023-048T12:12:00.000Z",
-  "2023-048T12:16:00.000Z", ...
+  "2023-048T12:00:00.000Z"
         ]`
 * `curl 127.0.0.1:5000/epochs/2023-063T11:15:00.000Z`
    - `{
