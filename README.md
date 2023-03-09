@@ -150,34 +150,36 @@ Each time you change the `Dockerfile` or `iss_tracker.py`, you must rebuild the 
   "STOP_TIME": "2023-077T15:47:35.995Z",
   "TIME_SYSTEM": "UTC"
 }`
-* `curl 127.0.0.1:5000/epochs/<epochname>/location`
+* `curl 127.0.0.1:5000/epochs/2023-081T06:24:00.000Z/location`
   - `{
-  "altitude": 420.6341310992075,
+"altitude": 432.2243764878176,
   "geolocation": {
     "address": {
-      "ISO3166-2-lvl4": "US-AZ",
-      "country": "United States",
-      "country_code": "us",
-      "county": "Pima County",
-      "state": "Arizona"
+      "ISO3166-2-lvl4": "AU-WA",
+      "country": "Australia",
+      "country_code": "au",
+      "hamlet": "Forrest",
+      "municipality": "City Of Kalgoorlie-Boulder",
+      "state": "Western Australia"
     },
     "boundingbox": [
-      "31.4254941",
-      "32.514423",
-      "-113.333992",
-      "-110.4473185"
+      "-31.381724",
+      "-30.143615",
+      "126.001409",
+      "129.0019211"
     ],
-    "display_name": "Pima County, Arizona, United States",
-    "lat": "32.1112624",
+    "display_name": "Forrest, City Of Kalgoorlie-Boulder, Western Australia, Australia",
+    "lat": "-30.8481034",
     "licence": "Data \u00a9 OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright",
-    "lon": "-111.6546163",
-    "osm_id": 1832206,
+    "lon": "128.1090137",
+    "osm_id": 11690215,
     "osm_type": "relation",
-    "place_id": 298478213
+    "place_id": 299633524
   },
-  "latitude": 31.815794472620638,
-  "longitude": -111.15947635149035
-}`
+  "latitude": -30.32491006141447,
+  "longitude": 127.43286582239388
+}
+`
 * `curl 127.0.0.1:5000/now`
   - `{
   "closest_epoch": "2023-077T15:47:35.995Z",
